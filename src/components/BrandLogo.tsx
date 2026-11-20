@@ -1,6 +1,6 @@
 export function BrandMark({
   size = 26,
-  variant = "mark",
+  variant = "stamp",
 }: {
   size?: number;
   variant?: "mark" | "stamp";
@@ -64,8 +64,8 @@ export function BrandLogo({ size = "md" }: { size?: "sm" | "md" }) {
   const textClass = size === "sm" ? "text-base" : "text-lg";
 
   return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <BrandMark size={iconSize} variant="mark" />
+    <span className="inline-flex items-center gap-2.5 whitespace-nowrap">
+      <BrandMark size={iconSize} variant="stamp" />
       <span className={`${textClass} font-semibold tracking-tight text-[#111111]`}>
         S.S Tailors
       </span>
