@@ -13,3 +13,7 @@ services:
         sync: false
       - key: NEXT_PUBLIC_SITE_URL
         sync: false
+      - key: DELHIVERY_ORIGIN_PIN
+        value: "110054"
+      - key: DELHIVERY_API_TOKEN
+        sync: false

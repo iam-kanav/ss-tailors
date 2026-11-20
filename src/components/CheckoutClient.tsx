@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import { formatINR } from "@/lib/format";
 import type { CustomMeasurements } from "@/lib/types";
+
+interface DelhiveryCheckoutEstimate {
+  source: "delhivery_live" | "delhivery_rate_card";
+  serviceable: boolean;
+  locationLabel: string;
+  options: { mode: "S" | "E"; label: string; totalRupees: number; etaDays: string }[];
+}
 
 interface CheckoutUser {
   id: string;
@@ -45,6 +52,39 @@ export function CheckoutClient({ user }: { user: CheckoutUser | null }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [placedOrder, setPlacedOrder] = useState<PlacedOrderResult | null>(null);
+  const [delhiveryEst, setDelhiveryEst] = useState<DelhiveryCheckoutEstimate | null>(null);
+  const [checkingPin, setCheckingPin] = useState(false);
+
+  const totalWeightGrams = Math.max(
+    450,
+    items.reduce((sum, item) => sum + item.quantity * 850, 0)
+  );
+
+  useEffect(() => {
+    const cleaned = postalCode.trim();
+    if (fulfillment !== "delivery" || !/^[1-9][0-9]{5}$/.test(cleaned)) {
+      setDelhiveryEst(null);
+      return;
+    }
+
+    let cancelled = false;
+    setCheckingPin(true);
+    fetch(`/api/shipping/estimate?pin=${cleaned}&weightGrams=${totalWeightGrams}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setDelhiveryEst(data as DelhiveryCheckoutEstimate);
+      })
+      .catch(() => {
+        if (!cancelled) setDelhiveryEst(null);
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingPin(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [postalCode, fulfillment, totalWeightGrams]);
 
   const hasCustomItems = items.some((i) => i.isCustomTailored);
   const estimatedShipping =
@@ -136,6 +176,10 @@ export function CheckoutClient({ user }: { user: CheckoutUser | null }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (fulfillment === "delivery" && delhiveryEst && !delhiveryEst.serviceable) {
+      setError(`Delhivery does not currently service PIN ${postalCode}. Choose shop pickup or another PIN.`);
+      return;
+    }
     setSubmitting(true);
 
     try {
@@ -295,12 +339,63 @@ export function CheckoutClient({ user }: { user: CheckoutUser | null }) {
                   <input
                     type="text"
                     required
+                    maxLength={6}
+                    inputMode="numeric"
                     value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value)}
+                    onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     placeholder="110054"
-                    className="w-full px-3.5 py-2.5 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111]"
+                    className="w-full px-3.5 py-2.5 border border-[#d4d4d4] text-sm tabular-nums focus:outline-none focus:border-[#111111]"
                   />
                 </div>
+              </div>
+
+              <div className="bg-[#f7f7f5] border border-[#e5e5e5] p-3.5 text-xs space-y-2">
+                <div className="flex items-center justify-between gap-2 text-[#555555]">
+                  <span className="font-medium text-[#111111]">Delhivery Shipping Estimate</span>
+                  <span className="text-[11px] text-[#777777]">
+                    {delhiveryEst
+                      ? delhiveryEst.source === "delhivery_live"
+                        ? "Live Delhivery API"
+                        : "Delhivery Rate Card"
+                      : "From Majnu Ka Tila (110054)"}
+                  </span>
+                </div>
+
+                {checkingPin ? (
+                  <p className="text-[#666666]">Checking Delhivery rates for PIN {postalCode}...</p>
+                ) : !delhiveryEst ? (
+                  <p className="text-[#666666]">
+                    Enter your 6-digit PIN code above to check Delhivery delivery availability,
+                    carrier rate, and estimated arrival time.
+                  </p>
+                ) : !delhiveryEst.serviceable ? (
+                  <p className="text-[#9b1c1c]">
+                    Delhivery does not currently service PIN {postalCode}. You can choose Majnu Ka
+                    Tila shop pickup or try another PIN code.
+                  </p>
+                ) : (
+                  <div className="space-y-1.5">
+                    <p className="text-[#555555]">
+                      To <strong className="text-[#111111]">{postalCode}</strong> (
+                      {delhiveryEst.locationLabel}) · Est. parcel {(totalWeightGrams / 1000).toFixed(2)} kg
+                    </p>
+                    <div className="divide-y divide-[#e5e5e5]">
+                      {delhiveryEst.options.map((opt) => (
+                        <div key={opt.mode} className="py-1.5 flex justify-between gap-3 text-[#111111]">
+                          <span>
+                            {opt.label}{" "}
+                            <span className="text-[#666666]">({opt.etaDays})</span>
+                          </span>
+                          <span className="tabular-nums font-medium">
+                            {subtotalPaise >= 500000 && opt.mode === "S"
+                              ? `Free (est. ₹${opt.totalRupees})`
+                              : `₹${opt.totalRupees}`}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
