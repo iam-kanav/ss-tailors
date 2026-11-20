@@ -16,15 +16,8 @@ export default async function CheckoutPage() {
     : null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-      <div className="mb-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#9e2a2b]">
-          Secure Atelier Checkout
-        </p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-medium text-[#171412] mt-1">
-          Complete Your S.S Tailors Order
-        </h1>
-      </div>
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-10">
+      <h1 className="text-2xl sm:text-3xl font-semibold text-[#111111] mb-8">Checkout</h1>
       <CheckoutClient user={checkoutUser} />
     </div>
   );

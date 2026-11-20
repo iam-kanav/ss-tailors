@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Package, ShieldCheck, Sparkles } from "lucide-react";
 import { getAuthenticatedContext } from "@/lib/supabase/server";
 import { formatDateIST, formatINR, ORDER_STATUS_LABELS } from "@/lib/format";
 import type { Order } from "@/lib/types";
@@ -23,119 +22,88 @@ export default async function AccountPage() {
   const orders = (ordersData ?? []) as Order[];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#e8e3dc]">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#9e2a2b]">
-            Client Portal
-          </p>
-          <h1 className="font-serif text-3xl sm:text-4xl font-medium text-[#171412] mt-1">
-            {profile?.full_name || "Your S.S Tailors Account"}
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#111111]">
+            {profile?.full_name || "My Account"}
           </h1>
-          <p className="text-sm text-[#6c635b] mt-1">{user.email}</p>
+          <p className="text-sm text-[#666666] mt-1">{user.email}</p>
         </div>
 
         <div className="flex items-center gap-3">
           {profile?.role === "admin" && (
             <Link
               href="/admin"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#9e2a2b] text-white text-xs font-semibold uppercase tracking-[0.12em]"
+              className="px-4 py-2 bg-[#9b1c1c] text-white text-sm font-medium"
             >
-              <ShieldCheck className="w-4 h-4" />
-              Open Admin Atelier
+              Admin Panel
             </Link>
           )}
           <Link
-            href="/#collection"
-            className="px-5 py-2.5 rounded-full border border-[#dcd5ca] text-xs font-semibold uppercase tracking-[0.12em] hover:border-[#171412]"
+            href="/#shop"
+            className="px-4 py-2 border border-[#d4d4d4] text-sm font-medium text-[#111111] hover:border-[#111111]"
           >
-            Shop Collection
+            Shop Clothing
           </Link>
         </div>
       </div>
 
-      {/* Orders List */}
-      <section className="space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-serif text-2xl font-medium text-[#171412]">Your Orders</h2>
-          <span className="text-xs font-mono text-[#7a7067]">{orders.length} total</span>
-        </div>
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#111111]">Orders ({orders.length})</h2>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-[#ece7df] p-12 text-center space-y-3">
-            <Package className="w-8 h-8 text-[#a3988c] mx-auto" />
-            <p className="font-serif text-2xl text-[#171412]">No orders placed yet</p>
-            <p className="text-xs text-[#6c635b]">
-              Explore our Tibetan Chubas, handwoven Pangdens, and mulberry silk Wonjus.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/#collection"
-                className="inline-flex px-6 py-2.5 rounded-full bg-[#171412] text-white text-xs font-semibold uppercase tracking-[0.12em]"
-              >
-                Browse Catalog
-              </Link>
-            </div>
+          <div className="border border-[#e5e5e5] p-10 text-center space-y-3">
+            <p className="text-sm text-[#555555]">You haven&apos;t placed any orders yet.</p>
+            <Link
+              href="/#shop"
+              className="inline-block px-5 py-2.5 bg-[#111111] text-white text-sm font-medium"
+            >
+              Browse Clothing
+            </Link>
           </div>
         ) : (
           <div className="space-y-4">
             {orders.map((order) => {
               const badge = ORDER_STATUS_LABELS[order.status] ?? {
                 label: order.status,
-                tone: "bg-stone-100 text-stone-700 border-stone-200",
+                tone: "bg-neutral-100 text-neutral-700 border-neutral-200",
               };
               return (
-                <div
-                  key={order.id}
-                  className="bg-white rounded-2xl border border-[#ece7df] overflow-hidden"
-                >
-                  <div className="px-6 py-4 bg-[#faf9f7] border-b border-[#eee9e2] flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-4 text-xs">
-                      <span className="font-mono font-semibold text-[#171412]">
+                <div key={order.id} className="border border-[#e5e5e5] bg-white">
+                  <div className="px-5 py-3.5 bg-[#f7f7f5] border-b border-[#e5e5e5] flex flex-wrap items-center justify-between gap-3 text-sm">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-semibold text-[#111111] tabular-nums">
                         {order.order_number}
                       </span>
-                      <span className="text-[#6c635b]">{formatDateIST(order.created_at)}</span>
-                      <span className="text-[#6c635b] capitalize">
+                      <span className="text-xs text-[#666666]">{formatDateIST(order.created_at)}</span>
+                      <span className="text-xs text-[#666666]">
                         {order.fulfillment_method === "studio_pickup"
                           ? "Majnu Ka Tila Pickup"
-                          : "Courier Delivery"}
+                          : "Delivery"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span
-                        className={`px-3 py-1 rounded-full border text-[11px] font-medium ${badge.tone}`}
-                      >
+                      <span className={`px-2.5 py-0.5 border text-xs ${badge.tone}`}>
                         {badge.label}
                       </span>
-                      <span className="font-mono text-sm font-semibold text-[#171412]">
+                      <span className="font-semibold tabular-nums text-[#111111]">
                         {formatINR(order.total_paise)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="px-6 py-4 divide-y divide-[#f3efe9]">
+                  <div className="px-5 py-3 divide-y divide-[#eeeeee]">
                     {(order.order_items ?? []).map((item) => (
-                      <div
-                        key={item.id}
-                        className="py-2.5 flex items-center justify-between gap-4 text-sm"
-                      >
+                      <div key={item.id} className="py-2.5 flex justify-between gap-4 text-sm">
                         <div>
-                          <p className="font-medium text-[#171412]">{item.product_name}</p>
-                          <p className="text-xs text-[#6c635b] flex items-center gap-1.5 mt-0.5">
-                            <span className="font-mono">{item.product_sku}</span>
-                            <span>·</span>
-                            {item.is_custom_tailored ? (
-                              <span className="inline-flex items-center gap-1 text-[#9e2a2b]">
-                                <Sparkles className="w-3 h-3" />
-                                Bespoke Custom Fit
-                              </span>
-                            ) : (
-                              <span>Size {item.size}</span>
-                            )}
-                            <span>× {item.quantity}</span>
+                          <p className="text-[#111111]">{item.product_name}</p>
+                          <p className="text-xs text-[#666666]">
+                            {item.is_custom_tailored ? "Custom Stitched" : `Size ${item.size}`} ×{" "}
+                            {item.quantity}
                           </p>
                         </div>
-                        <span className="font-mono text-sm text-[#171412]">
+                        <span className="tabular-nums text-[#111111]">
                           {formatINR(item.line_total_paise)}
                         </span>
                       </div>

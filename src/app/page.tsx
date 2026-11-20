@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, Scissors, ShieldCheck, Sparkles } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Category, ProductWithCategory } from "@/lib/types";
 import { StorefrontCatalog } from "@/components/StorefrontCatalog";
@@ -39,130 +38,45 @@ export default async function HomePage({
 
   return (
     <div>
-      {/* Minimal Editorial Hero */}
-      <section className="relative bg-white border-b border-[#ece7df] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Editorial Copy */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#faf9f7] border border-[#e8e3dc] text-[11px] font-medium tracking-[0.12em] uppercase text-[#5e554e]">
-                <MapPin className="w-3.5 h-3.5 text-[#9e2a2b]" />
-                Majnu Ka Tila · New Delhi
-              </div>
+      {/* Clean Unobstructed Clothing Banner */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pt-5 sm:pt-7">
+        <div className="w-full overflow-hidden bg-[#f5f5f3]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/hero-atelier.jpg"
+            alt="Traditional Tibetan Chubas and handwoven Pangden from S.S Tailors"
+            className="w-full h-[300px] sm:h-[420px] lg:h-[500px] object-cover object-center"
+          />
+        </div>
 
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-[56px] font-medium text-[#171412] leading-[1.06] tracking-[-0.01em]">
-                Tibetan Heritage,{" "}
-                <span className="italic text-[#9e2a2b]">Tailored</span> with Quiet Precision.
-              </h1>
-
-              <p className="text-sm sm:text-base text-[#5d554d] leading-relaxed max-w-lg">
-                From handwoven <span className="text-[#171412] font-medium">pulu wool Chubas</span> and
-                striped <span className="text-[#171412] font-medium">Pangden aprons</span> to pure
-                mulberry silk <span className="text-[#171412] font-medium">Wonjus</span> and
-                ceremonial Losar kinkhab robes—crafted individually at S.S Tailors.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link
-                  href="#collection"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#171412] hover:bg-[#9e2a2b] text-white text-xs font-semibold uppercase tracking-[0.14em] transition-colors shadow-sm"
-                >
-                  Explore Collection
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="#bespoke"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-[#faf9f7] text-[#171412] border border-[#dcd5ca] text-xs font-semibold uppercase tracking-[0.14em] transition-colors"
-                >
-                  Book Studio Fitting
-                </Link>
-              </div>
-
-              <div className="pt-6 border-t border-[#f0ebe4] grid grid-cols-3 gap-4">
-                <div>
-                  <span className="block font-serif text-2xl font-semibold text-[#171412]">8</span>
-                  <span className="text-[11px] text-[#7a7067]">Traditional Categories</span>
-                </div>
-                <div>
-                  <span className="block font-serif text-2xl font-semibold text-[#171412]">100%</span>
-                  <span className="text-[11px] text-[#7a7067]">Bespoke Sizing Option</span>
-                </div>
-                <div>
-                  <span className="block font-serif text-2xl font-semibold text-[#171412]">Delhi</span>
-                  <span className="text-[11px] text-[#7a7067]">Majnu Ka Tila Atelier</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Sunlit Studio Mannequin Trio Showcase */}
-            <div className="lg:col-span-7">
-              <div className="relative rounded-3xl overflow-hidden border border-[#ece7df] bg-white shadow-[0_24px_65px_-28px_rgba(23,20,18,0.2)]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/hero-atelier.jpg"
-                  alt="S.S Tailors Majnu Ka Tila signature Tibetan Chubas and Pangden displayed on linen studio mannequins"
-                  className="w-full h-auto object-cover aspect-[16/10]"
-                />
-                <div className="absolute bottom-4 left-4 right-4 sm:right-auto bg-white/92 backdrop-blur-md border border-[#ece7df] rounded-2xl px-4 py-3 flex items-center gap-3 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-[#9e2a2b] shrink-0" />
-                  <div className="text-xs">
-                    <p className="font-medium text-[#171412]">
-                      Losar &amp; Winter Heritage Capsule
-                    </p>
-                    <p className="text-[11px] text-[#6c635b]">
-                      Crimson Brocade Chuba · Indigo Kinkhab · Handwoven Lhasa Pangden
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="pt-6 pb-2 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#111111]">
+              Authentic Tibetan Clothing
+            </h1>
+            <p className="mt-1.5 text-sm sm:text-base text-[#555555] leading-relaxed">
+              We have been making and selling authentic Tibetan clothing in Majnu Ka Tila, Delhi —
+              Chubas, Pangdens, Wonjus, brocade jackets, and custom-stitched traditional wear.
+            </p>
           </div>
+
+          <Link
+            href="#shop"
+            className="shrink-0 inline-flex items-center justify-center px-6 py-2.5 bg-[#111111] hover:bg-[#9b1c1c] text-white text-sm font-medium transition-colors self-start md:self-auto"
+          >
+            Shop All ({products.length})
+          </Link>
         </div>
       </section>
 
-      {/* Subtle Craft Trust Bar */}
-      <section className="bg-[#faf9f7] border-b border-[#ece7df]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-full bg-white border border-[#e8e3dc] flex items-center justify-center shrink-0">
-              <Scissors className="w-4 h-4 text-[#9e2a2b]" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-[#171412]">Master Pattern Cutting</p>
-              <p className="text-[11px] text-[#6c635b]">Authentic Lhasa, Kham &amp; Amdo silhouettes</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-full bg-white border border-[#e8e3dc] flex items-center justify-center shrink-0">
-              <Sparkles className="w-4 h-4 text-[#c8922e]" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-[#171412]">Complimentary Custom Fit</p>
-              <p className="text-[11px] text-[#6c635b]">Submit measurements online or at Majnu Ka Tila</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-full bg-white border border-[#e8e3dc] flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4 text-[#1f3a52]" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-[#171412]">Verified Pricing &amp; Security</p>
-              <p className="text-[11px] text-[#6c635b]">Server-validated checkout &amp; insulated order privacy</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Tibetan Clothing Storefront Catalog */}
+      {/* Main Clothing Catalog */}
       <StorefrontCatalog
         categories={categories}
         products={products}
         initialCategory={initialCategory}
       />
 
-      {/* Bespoke Majnu Ka Tila Atelier & Fitting Booking */}
+      {/* Simple Custom Tailoring Inquiry */}
       <TailoringSection />
     </div>
   );

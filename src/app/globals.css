@@ -1,31 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --surface: #faf9f7;
-  --card: #ffffff;
-  --ink: #171412;
-  --muted: #6c635b;
-  --border: #e8e3dc;
-  --vermilion: #9e2a2b;
-  --vermilion-dark: #7d1f20;
-  --saffron: #c8922e;
-  --lapis: #1f3a52;
-  --emerald: #2b6b4f;
+  --bg: #ffffff;
+  --surface: #f7f7f5;
+  --photo-bg: #f5f5f3;
+  --ink: #111111;
+  --muted: #666666;
+  --border: #e5e5e5;
+  --accent: #9b1c1c;
 }
 
 @theme inline {
-  --color-surface: var(--surface);
-  --color-ink: var(--ink);
-  --color-muted: var(--muted);
-  --color-border-warm: var(--border);
-  --color-vermilion: var(--vermilion);
-  --color-vermilion-dark: var(--vermilion-dark);
-  --color-saffron: var(--saffron);
-  --color-lapis: var(--lapis);
-  --color-emerald-brand: var(--emerald);
-  --font-serif: var(--font-cormorant), Georgia, serif;
-  --font-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-sans: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 html {
@@ -33,7 +19,7 @@ html {
 }
 
 body {
-  background-color: var(--surface);
+  background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
   overflow-x: clip;
@@ -41,54 +27,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Signature 2px Tibetan Pangden woven heritage stripe */
-.pangden-thread {
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    #1f3a52 0%,
-    #1f3a52 20%,
-    #f6f3ee 20%,
-    #f6f3ee 40%,
-    #9e2a2b 40%,
-    #9e2a2b 60%,
-    #2b6b4f 60%,
-    #2b6b4f 80%,
-    #c8922e 80%,
-    #c8922e 100%
-  );
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.animate-fade-up {
-  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Clean custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f4f1ec;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cfc6ba;
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a99d8f;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

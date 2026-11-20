@@ -2,22 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  FolderPlus,
-  ImagePlus,
-  Package,
-  Pencil,
-  Plus,
-  ShieldCheck,
-  ShoppingBag,
-  Trash2,
-  Upload,
-  Calendar,
-  Activity,
-} from "lucide-react";
+import { Eye, EyeOff, Pencil, Trash2, Upload } from "lucide-react";
 import type {
   AuditLog,
   Category,
@@ -83,7 +68,7 @@ export function AdminDashboard({
 
   const [banner, setBanner] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Product Form State (Create & Edit)
+  // Product Form State
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [tibetanName, setTibetanName] = useState("");
@@ -182,12 +167,9 @@ export function AdminDashboard({
         return;
       }
       setImageUrl(json.url);
-      setBanner({
-        type: "success",
-        text: "Studio image verified (magic-bytes validated) and uploaded to Supabase Storage.",
-      });
+      setBanner({ type: "success", text: "Photo uploaded successfully." });
     } catch {
-      setBanner({ type: "error", text: "Network error during image upload." });
+      setBanner({ type: "error", text: "Network error during upload." });
     } finally {
       setUploadingImage(false);
       e.target.value = "";
@@ -198,7 +180,7 @@ export function AdminDashboard({
     e.preventDefault();
     setBanner(null);
     if (sizes.length === 0) {
-      setBanner({ type: "error", text: "Select at least one available size." });
+      setBanner({ type: "error", text: "Select at least one size." });
       return;
     }
 
@@ -243,15 +225,15 @@ export function AdminDashboard({
         setProducts((prev) =>
           prev.map((p) => (p.id === editingId ? (json.product as ProductWithCategory) : p))
         );
-        setBanner({ type: "success", text: `Updated "${json.product.name}" successfully.` });
+        setBanner({ type: "success", text: `Updated "${json.product.name}".` });
       } else {
         setProducts((prev) => [json.product as ProductWithCategory, ...prev]);
-        setBanner({ type: "success", text: `Created "${json.product.name}" and published to catalog.` });
+        setBanner({ type: "success", text: `Added "${json.product.name}" to the shop.` });
       }
 
       resetProductForm();
     } catch {
-      setBanner({ type: "error", text: "Network error while saving product." });
+      setBanner({ type: "error", text: "Network error while saving." });
     } finally {
       setSavingProduct(false);
     }
@@ -275,7 +257,7 @@ export function AdminDashboard({
   };
 
   const handleDeleteProduct = async (product: ProductWithCategory) => {
-    if (!window.confirm(`Delete "${product.name}" permanently?`)) return;
+    if (!window.confirm(`Delete "${product.name}"?`)) return;
     setBanner(null);
     const res = await fetch(`/api/admin/products/${product.id}`, { method: "DELETE" });
     const json = await res.json();
@@ -305,7 +287,7 @@ export function AdminDashboard({
       });
       const json = await res.json();
       if (!res.ok) {
-        setBanner({ type: "error", text: json.error ?? "Failed to add category." });
+        setBanner({ type: "error", text: json.error ?? "Failed to create category." });
         return;
       }
       setCategories((prev) => [...prev, json.category as Category]);
@@ -314,7 +296,7 @@ export function AdminDashboard({
       setCatSlug("");
       setCatDesc("");
       setCatSort(String(categories.length + 2));
-      setBanner({ type: "success", text: `Category "${json.category.name}" added.` });
+      setBanner({ type: "success", text: `Added category "${json.category.name}".` });
     } finally {
       setSavingCat(false);
     }
@@ -335,7 +317,7 @@ export function AdminDashboard({
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: json.order.status } : o))
     );
-    setBanner({ type: "success", text: `Order ${json.order.order_number} marked "${status}".` });
+    setBanner({ type: "success", text: `Order ${json.order.order_number} updated to ${status}.` });
   };
 
   const handleInquiryStatusChange = async (
@@ -361,61 +343,51 @@ export function AdminDashboard({
 
   return (
     <div className="space-y-8">
-      {/* Header & KPI Bar */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#e8e3dc]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#9e2a2b]">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Verified Admin Atelier · RLS Enforced
-          </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-medium text-[#171412] mt-1">
-            S.S Tailors Studio Console
-          </h1>
-          <p className="text-xs text-[#6c635b] mt-1">
-            Signed in as <span className="font-mono text-[#171412]">{adminEmail}</span>
-          </p>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#111111]">S.S Tailors Admin</h1>
+          <p className="text-sm text-[#666666] mt-1">{adminEmail}</p>
         </div>
-
         <Link
           href="/"
-          className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-[#dcd5ca] bg-white text-xs font-semibold uppercase tracking-[0.12em] hover:border-[#171412]"
+          className="px-4 py-2 border border-[#d4d4d4] text-sm font-medium text-[#111111] hover:border-[#111111] self-start sm:self-auto"
         >
-          View Live Storefront
+          View Store
         </Link>
       </div>
 
-      {/* KPI Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-[#ece7df] p-5">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-[#7a7067]">Catalog Products</p>
-          <p className="font-serif text-3xl font-semibold text-[#171412] mt-1">{products.length}</p>
+        <div className="border border-[#e5e5e5] p-4">
+          <p className="text-xs text-[#666666]">Products</p>
+          <p className="text-2xl font-semibold text-[#111111] mt-1 tabular-nums">{products.length}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-[#ece7df] p-5">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-[#7a7067]">Tibetan Categories</p>
-          <p className="font-serif text-3xl font-semibold text-[#171412] mt-1">{categories.length}</p>
+        <div className="border border-[#e5e5e5] p-4">
+          <p className="text-xs text-[#666666]">Categories</p>
+          <p className="text-2xl font-semibold text-[#111111] mt-1 tabular-nums">{categories.length}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-[#ece7df] p-5">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-[#7a7067]">Customer Orders</p>
-          <p className="font-serif text-3xl font-semibold text-[#171412] mt-1">{orders.length}</p>
+        <div className="border border-[#e5e5e5] p-4">
+          <p className="text-xs text-[#666666]">Orders</p>
+          <p className="text-2xl font-semibold text-[#111111] mt-1 tabular-nums">{orders.length}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-[#ece7df] p-5">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-[#7a7067]">Order Volume</p>
-          <p className="font-mono text-2xl font-semibold text-[#9e2a2b] mt-2">
+        <div className="border border-[#e5e5e5] p-4">
+          <p className="text-xs text-[#666666]">Order Total</p>
+          <p className="text-2xl font-semibold text-[#111111] mt-1 tabular-nums">
             {formatINR(totalRevenuePaise)}
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-[#e8e3dc] pb-4">
+      <div className="flex gap-6 border-b border-[#e5e5e5] overflow-x-auto no-scrollbar">
         {(
           [
-            ["products", "Products & Create", Package],
-            ["categories", "Categories", FolderPlus],
-            ["orders", `Orders (${orders.length})`, ShoppingBag],
-            ["inquiries", `Fittings & Audit (${inquiries.length})`, Calendar],
+            ["products", "Products"],
+            ["categories", "Categories"],
+            ["orders", `Orders (${orders.length})`],
+            ["inquiries", `Fittings & Log (${inquiries.length})`],
           ] as const
-        ).map(([id, label, Icon]) => (
+        ).map(([id, label]) => (
           <button
             key={id}
             type="button"
@@ -423,13 +395,12 @@ export function AdminDashboard({
               setTab(id);
               setBanner(null);
             }}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide border transition-all cursor-pointer ${
+            className={`pb-3 text-sm border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
               tab === id
-                ? "bg-[#171412] text-white border-[#171412]"
-                : "bg-white text-[#4b443e] border-[#e5dfd6] hover:border-[#171412]"
+                ? "border-[#111111] text-[#111111] font-medium"
+                : "border-transparent text-[#666666] hover:text-[#111111]"
             }`}
           >
-            <Icon className="w-3.5 h-3.5" />
             {label}
           </button>
         ))}
@@ -437,440 +408,380 @@ export function AdminDashboard({
 
       {banner && (
         <div
-          className={`px-4 py-3 rounded-2xl border text-xs font-medium flex items-center gap-2 ${
+          className={`px-4 py-3 border text-sm ${
             banner.type === "success"
-              ? "bg-[#f3f9f5] border-[#cde6d5] text-[#1f5139]"
-              : "bg-[#fdf2f2] border-[#f5d0d0] text-[#9e2a2b]"
+              ? "bg-[#f5faf6] border-[#c8e6cf] text-[#1d5e31]"
+              : "bg-[#fef2f2] border-[#f5c6c6] text-[#9b1c1c]"
           }`}
         >
-          {banner.type === "success" && <CheckCircle2 className="w-4 h-4 shrink-0" />}
-          <span>{banner.text}</span>
+          {banner.text}
         </div>
       )}
 
-      {/* TAB 1: PRODUCTS + CREATE PRODUCT */}
+      {/* PRODUCTS TAB */}
       {tab === "products" && (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-          {/* Create / Edit Form */}
-          <form
-            onSubmit={handleSaveProduct}
-            className="xl:col-span-5 bg-white rounded-3xl border border-[#e8e3dc] overflow-hidden shadow-xs"
-          >
-            <div className="px-6 py-5 bg-[#faf9f7] border-b border-[#eee9e2] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4 text-[#9e2a2b]" />
-                <h2 className="font-serif text-2xl font-medium text-[#171412]">
-                  {editingId ? "Edit Garment" : "Create New Product"}
-                </h2>
-              </div>
+          <form onSubmit={handleSaveProduct} className="xl:col-span-5 border border-[#e5e5e5] p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#eeeeee]">
+              <h2 className="text-base font-semibold text-[#111111]">
+                {editingId ? "Edit Product" : "Add New Product"}
+              </h2>
               {editingId && (
                 <button
                   type="button"
                   onClick={resetProductForm}
-                  className="text-xs font-medium text-[#9e2a2b] hover:underline cursor-pointer"
+                  className="text-xs text-[#9b1c1c] hover:underline cursor-pointer"
                 >
-                  Cancel Edit
+                  Cancel edit
                 </button>
               )}
             </div>
 
-            <div className="p-6 space-y-4">
-              {/* Studio Image Preview + Secure Upload */}
-              <div className="p-4 rounded-2xl bg-[#faf9f7] border border-[#ece7df] space-y-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-26 bg-white rounded-xl border border-[#e8e3dc] overflow-hidden shrink-0 flex items-center justify-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={imageUrl}
-                      alt="Product preview"
-                      className="w-full h-full object-contain p-1"
+            {/* Image Upload */}
+            <div className="p-4 bg-[#f7f7f5] border border-[#e5e5e5] space-y-3">
+              <div className="flex items-center gap-4">
+                <div className="w-18 aspect-[3/4] bg-white border border-[#e5e5e5] overflow-hidden shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <label className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#111111] hover:bg-[#9b1c1c] text-white text-xs font-medium cursor-pointer transition-colors">
+                    <Upload className="w-3.5 h-3.5" />
+                    {uploadingImage ? "Uploading..." : "Upload Product Photo"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleFileUpload}
+                      disabled={uploadingImage}
+                      className="hidden"
                     />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <p className="text-xs font-semibold text-[#171412] flex items-center gap-1.5">
-                      <ImagePlus className="w-3.5 h-3.5 text-[#9e2a2b]" />
-                      Studio Product Photo
-                    </p>
-                    <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#171412] hover:bg-[#9e2a2b] text-white text-[11px] font-semibold cursor-pointer transition-colors">
-                      <Upload className="w-3.5 h-3.5" />
-                      {uploadingImage ? "Validating & Uploading..." : "Upload JPG / PNG / WebP"}
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={handleFileUpload}
-                        disabled={uploadingImage}
-                        className="hidden"
-                      />
-                    </label>
-                    <p className="text-[10px] text-[#7a7067]">
-                      Max 5 MB · Magic-byte verified · Stored in Supabase Storage
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-medium text-[#6c635b] mb-1">
-                    Or pick an existing mannequin studio shot:
                   </label>
-                  <select
-                    value={STUDIO_ASSET_PRESETS.some((p) => p.url === imageUrl) ? imageUrl : ""}
-                    onChange={(e) => {
-                      if (e.target.value) setImageUrl(e.target.value);
-                    }}
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] bg-white text-xs"
-                  >
-                    <option value="">Uploaded custom media</option>
-                    {STUDIO_ASSET_PRESETS.map((preset) => (
-                      <option key={preset.url} value={preset.url}>
-                        {preset.label}
-                      </option>
-                    ))}
-                  </select>
+                  <p className="text-[11px] text-[#666666]">JPG, PNG, or WebP up to 5 MB</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                    Garment Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    minLength={2}
-                    maxLength={160}
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (!editingId) setSlug(slugify(e.target.value));
-                    }}
-                    placeholder="Lhasa Silk Brocade Chuba"
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                    Tibetan Name (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={120}
-                    value={tibetanName}
-                    onChange={(e) => setTibetanName(e.target.value)}
-                    placeholder="ཕྱུ་པ་"
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                    Category *
-                  </label>
-                  <select
-                    required
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] bg-white text-sm focus:outline-none focus:border-[#9e2a2b]"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">SKU *</label>
-                  <input
-                    type="text"
-                    required
-                    value={sku}
-                    onChange={(e) => setSku(normalizeSku(e.target.value))}
-                    placeholder="SST-WC-109"
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm font-mono uppercase focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-[#4b443e] mb-1">URL Slug *</label>
-                <input
-                  type="text"
-                  required
-                  value={slug}
-                  onChange={(e) => setSlug(slugify(e.target.value))}
-                  placeholder="lhasa-silk-brocade-chuba"
-                  className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-xs font-mono focus:outline-none focus:border-[#9e2a2b]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">Price (₹) *</label>
-                  <input
-                    type="number"
-                    required
-                    min={1}
-                    max={500000}
-                    step="1"
-                    value={priceRupees}
-                    onChange={(e) => setPriceRupees(e.target.value)}
-                    placeholder="8500"
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm font-mono focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">MRP (₹)</label>
-                  <input
-                    type="number"
-                    min={2}
-                    max={600000}
-                    step="1"
-                    value={compareAtRupees}
-                    onChange={(e) => setCompareAtRupees(e.target.value)}
-                    placeholder="9800"
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm font-mono focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">Stock *</label>
-                  <input
-                    type="number"
-                    required
-                    min={0}
-                    max={10000}
-                    value={stockQty}
-                    onChange={(e) => setStockQty(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm font-mono focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-[#4b443e] mb-1">Lead (d)</label>
-                  <input
-                    type="number"
-                    required
-                    min={1}
-                    max={90}
-                    value={leadTimeDays}
-                    onChange={(e) => setLeadTimeDays(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm font-mono focus:outline-none focus:border-[#9e2a2b]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-[#4b443e] mb-1">Fabric *</label>
-                <input
-                  type="text"
-                  required
-                  value={fabric}
-                  onChange={(e) => setFabric(e.target.value)}
-                  placeholder="Handwoven Pulu Wool & Varanasi Silk Brocade"
-                  className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm focus:outline-none focus:border-[#9e2a2b]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                  Garment Description *
-                </label>
-                <textarea
-                  rows={3}
-                  required
-                  minLength={10}
-                  maxLength={3000}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe the silhouette, weave, brocade trim, and occasion..."
-                  className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm focus:outline-none focus:border-[#9e2a2b] resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                  Care Instructions
-                </label>
-                <input
-                  type="text"
-                  value={careInstructions}
-                  onChange={(e) => setCareInstructions(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-[#e3ddd4] text-sm focus:outline-none focus:border-[#9e2a2b]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-[#4b443e] mb-1.5">
-                  Available Sizes *
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                  {ALL_SIZE_PRESETS.map((sz) => {
-                    const selected = sizes.includes(sz);
-                    return (
-                      <button
-                        key={sz}
-                        type="button"
-                        onClick={() => toggleSize(sz)}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-colors cursor-pointer ${
-                          selected
-                            ? "bg-[#171412] text-white border-[#171412]"
-                            : "bg-white text-[#5d554d] border-[#e3ddd4] hover:border-[#171412]"
-                        }`}
-                      >
-                        {sz}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-5 pt-2 text-xs text-[#2d2824]">
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={allowCustom}
-                    onChange={(e) => setAllowCustom(e.target.checked)}
-                    className="accent-[#9e2a2b]"
-                  />
-                  Bespoke Custom Tailoring
-                </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isFeatured}
-                    onChange={(e) => setIsFeatured(e.target.checked)}
-                    className="accent-[#9e2a2b]"
-                  />
-                  Atelier Pick (Featured)
-                </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isActive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                    className="accent-[#9e2a2b]"
-                  />
-                  Visible in Storefront
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={savingProduct || uploadingImage}
-                className="w-full py-3.5 px-6 rounded-full bg-[#171412] hover:bg-[#9e2a2b] disabled:opacity-60 text-white text-xs font-semibold uppercase tracking-[0.14em] transition-colors cursor-pointer"
+              <select
+                value={STUDIO_ASSET_PRESETS.some((p) => p.url === imageUrl) ? imageUrl : ""}
+                onChange={(e) => {
+                  if (e.target.value) setImageUrl(e.target.value);
+                }}
+                className="w-full px-3 py-2 border border-[#d4d4d4] bg-white text-xs"
               >
-                {savingProduct
-                  ? "Saving to Supabase..."
-                  : editingId
-                    ? "Save Garment Changes"
-                    : "Publish Product to Store"}
-              </button>
+                <option value="">Custom uploaded photo</option>
+                {STUDIO_ASSET_PRESETS.map((preset) => (
+                  <option key={preset.url} value={preset.url}>
+                    Use catalog photo: {preset.label}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  minLength={2}
+                  maxLength={160}
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (!editingId) setSlug(slugify(e.target.value));
+                  }}
+                  placeholder="Silk Brocade Chuba"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">
+                  Tibetan Name (optional)
+                </label>
+                <input
+                  type="text"
+                  maxLength={120}
+                  value={tibetanName}
+                  onChange={(e) => setTibetanName(e.target.value)}
+                  placeholder="ཕྱུ་པ་"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">Category *</label>
+                <select
+                  required
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  className="w-full px-3 py-2 border border-[#d4d4d4] bg-white text-sm focus:outline-none focus:border-[#111111]"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">SKU *</label>
+                <input
+                  type="text"
+                  required
+                  value={sku}
+                  onChange={(e) => setSku(normalizeSku(e.target.value))}
+                  placeholder="SST-WC-109"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm uppercase focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#444444] mb-1">URL Slug *</label>
+              <input
+                type="text"
+                required
+                value={slug}
+                onChange={(e) => setSlug(slugify(e.target.value))}
+                placeholder="silk-brocade-chuba"
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">Price (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  max={500000}
+                  value={priceRupees}
+                  onChange={(e) => setPriceRupees(e.target.value)}
+                  placeholder="8500"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm tabular-nums focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">MRP (₹)</label>
+                <input
+                  type="number"
+                  min={2}
+                  max={600000}
+                  value={compareAtRupees}
+                  onChange={(e) => setCompareAtRupees(e.target.value)}
+                  placeholder="9800"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm tabular-nums focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">Stock *</label>
+                <input
+                  type="number"
+                  required
+                  min={0}
+                  max={10000}
+                  value={stockQty}
+                  onChange={(e) => setStockQty(e.target.value)}
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm tabular-nums focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#444444] mb-1">Days</label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  max={90}
+                  value={leadTimeDays}
+                  onChange={(e) => setLeadTimeDays(e.target.value)}
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm tabular-nums focus:outline-none focus:border-[#111111]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#444444] mb-1">Fabric *</label>
+              <input
+                type="text"
+                required
+                value={fabric}
+                onChange={(e) => setFabric(e.target.value)}
+                placeholder="Pulu wool, silk brocade, mulberry silk..."
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#444444] mb-1">Description *</label>
+              <textarea
+                rows={3}
+                required
+                minLength={10}
+                maxLength={3000}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Details about the garment, fit, and occasion"
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111] resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#444444] mb-1">Care</label>
+              <input
+                type="text"
+                value={careInstructions}
+                onChange={(e) => setCareInstructions(e.target.value)}
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm focus:outline-none focus:border-[#111111]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#444444] mb-1.5">Sizes *</label>
+              <div className="flex flex-wrap gap-1.5">
+                {ALL_SIZE_PRESETS.map((sz) => {
+                  const selected = sizes.includes(sz);
+                  return (
+                    <button
+                      key={sz}
+                      type="button"
+                      onClick={() => toggleSize(sz)}
+                      className={`px-2.5 py-1 text-xs border transition-colors cursor-pointer ${
+                        selected
+                          ? "bg-[#111111] text-white border-[#111111]"
+                          : "bg-white text-[#444444] border-[#d4d4d4] hover:border-[#111111]"
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-5 pt-2 text-xs text-[#222222]">
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={allowCustom}
+                  onChange={(e) => setAllowCustom(e.target.checked)}
+                />
+                Allow custom stitching
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                />
+                Featured
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                />
+                Visible in store
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={savingProduct || uploadingImage}
+              className="w-full py-3 px-6 bg-[#111111] hover:bg-[#9b1c1c] disabled:opacity-60 text-white text-sm font-medium transition-colors cursor-pointer"
+            >
+              {savingProduct ? "Saving..." : editingId ? "Save Changes" : "Create Product"}
+            </button>
           </form>
 
-          {/* Product Inventory Table */}
-          <div className="xl:col-span-7 bg-white rounded-3xl border border-[#e8e3dc] overflow-hidden">
-            <div className="px-6 py-5 bg-[#faf9f7] border-b border-[#eee9e2] flex items-center justify-between">
-              <h2 className="font-serif text-2xl font-medium text-[#171412]">
-                Catalog Inventory ({products.length})
+          {/* Inventory List */}
+          <div className="xl:col-span-7 border border-[#e5e5e5] divide-y divide-[#eeeeee]">
+            <div className="px-5 py-4 bg-[#f7f7f5]">
+              <h2 className="text-base font-semibold text-[#111111]">
+                All Products ({products.length})
               </h2>
             </div>
 
-            <div className="divide-y divide-[#f0ebe4]">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="p-4 sm:p-5 flex items-center gap-4 hover:bg-[#fcfbf9] transition-colors"
-                >
-                  <div className="w-16 h-20 rounded-xl bg-white border border-[#ece7df] overflow-hidden shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-contain p-1"
-                    />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm text-[#171412] truncate">
-                        {product.name}
-                      </span>
-                      {!product.is_active && (
-                        <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 text-[10px] font-medium">
-                          Hidden
-                        </span>
-                      )}
-                      {product.is_featured && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#fdf2f2] text-[#9e2a2b] text-[10px] font-medium">
-                          Featured
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-[#6c635b] mt-0.5">
-                      {product.categories?.name} · <span className="font-mono">{product.sku}</span> ·{" "}
-                      Stock: <span className="font-mono font-medium">{product.stock_quantity}</span>
-                    </p>
-                    <p className="font-mono text-sm font-semibold text-[#171412] mt-1">
-                      {formatINR(product.price_paise)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => startEditing(product)}
-                      title="Edit product"
-                      aria-label={`Edit ${product.name}`}
-                      className="p-2 rounded-lg text-[#4b443e] hover:bg-[#f4f1ec] hover:text-[#171412] cursor-pointer"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleActive(product)}
-                      title={product.is_active ? "Hide from store" : "Show in store"}
-                      aria-label={`Toggle visibility for ${product.name}`}
-                      className="p-2 rounded-lg text-[#4b443e] hover:bg-[#f4f1ec] hover:text-[#171412] cursor-pointer"
-                    >
-                      {product.is_active ? (
-                        <Eye className="w-4 h-4" />
-                      ) : (
-                        <EyeOff className="w-4 h-4 text-[#9e2a2b]" />
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteProduct(product)}
-                      title="Delete product"
-                      aria-label={`Delete ${product.name}`}
-                      className="p-2 rounded-lg text-[#8c8278] hover:bg-[#fdf2f2] hover:text-[#9e2a2b] cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+            {products.map((product) => (
+              <div key={product.id} className="p-4 flex items-center gap-4">
+                <div className="w-14 aspect-[3/4] bg-[#f5f5f3] overflow-hidden shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ))}
-            </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[#111111] truncate">
+                      {product.name}
+                    </span>
+                    {!product.is_active && (
+                      <span className="px-2 py-0.5 bg-[#eeeeee] text-[#555555] text-[11px]">
+                        Hidden
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-[#666666] mt-0.5">
+                    {product.categories?.name} · {product.sku} · Stock: {product.stock_quantity}
+                  </p>
+                  <p className="text-sm font-medium tabular-nums text-[#111111] mt-0.5">
+                    {formatINR(product.price_paise)}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => startEditing(product)}
+                    title="Edit"
+                    aria-label={`Edit ${product.name}`}
+                    className="p-2 text-[#555555] hover:text-[#111111] cursor-pointer"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(product)}
+                    title={product.is_active ? "Hide" : "Show"}
+                    aria-label={`Toggle ${product.name}`}
+                    className="p-2 text-[#555555] hover:text-[#111111] cursor-pointer"
+                  >
+                    {product.is_active ? (
+                      <Eye className="w-4 h-4" />
+                    ) : (
+                      <EyeOff className="w-4 h-4 text-[#9b1c1c]" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProduct(product)}
+                    title="Delete"
+                    aria-label={`Delete ${product.name}`}
+                    className="p-2 text-[#777777] hover:text-[#9b1c1c] cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* TAB 2: CATEGORIES */}
+      {/* CATEGORIES TAB */}
       {tab === "categories" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <form
-            onSubmit={handleCreateCategory}
-            className="lg:col-span-5 bg-white rounded-3xl border border-[#e8e3dc] p-6 space-y-4"
-          >
-            <h2 className="font-serif text-2xl font-medium text-[#171412]">
-              Add Tibetan Garment Category
-            </h2>
+          <form onSubmit={handleCreateCategory} className="lg:col-span-5 border border-[#e5e5e5] p-6 space-y-4">
+            <h2 className="text-base font-semibold text-[#111111]">Add Category</h2>
             <div>
-              <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                Category Name *
-              </label>
+              <label className="block text-xs font-medium text-[#444444] mb-1">Name *</label>
               <input
                 type="text"
                 required
@@ -879,113 +790,101 @@ export function AdminDashboard({
                   setCatName(e.target.value);
                   setCatSlug(slugify(e.target.value));
                 }}
-                placeholder="Tibetan Hats & Boots (Shamo & Somba)"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#e3ddd4] text-sm"
+                placeholder="Tibetan Hats & Boots"
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#4b443e] mb-1">
-                Tibetan Script / Term
+              <label className="block text-xs font-medium text-[#444444] mb-1">
+                Tibetan Name (optional)
               </label>
               <input
                 type="text"
                 value={catTibetan}
                 onChange={(e) => setCatTibetan(e.target.value)}
-                placeholder="ཞྭ་མོ་དང་ཟོམ་པ་"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#e3ddd4] text-sm"
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm"
               />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <label className="block text-xs font-medium text-[#4b443e] mb-1">Slug *</label>
+                <label className="block text-xs font-medium text-[#444444] mb-1">Slug *</label>
                 <input
                   type="text"
                   required
                   value={catSlug}
                   onChange={(e) => setCatSlug(slugify(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#e3ddd4] text-xs font-mono"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#4b443e] mb-1">Order</label>
+                <label className="block text-xs font-medium text-[#444444] mb-1">Order</label>
                 <input
                   type="number"
                   value={catSort}
                   onChange={(e) => setCatSort(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#e3ddd4] text-sm font-mono"
+                  className="w-full px-3 py-2 border border-[#d4d4d4] text-sm tabular-nums"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#4b443e] mb-1">Description</label>
+              <label className="block text-xs font-medium text-[#444444] mb-1">Description</label>
               <textarea
                 rows={3}
                 value={catDesc}
                 onChange={(e) => setCatDesc(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#e3ddd4] text-sm resize-none"
+                className="w-full px-3 py-2 border border-[#d4d4d4] text-sm resize-none"
               />
             </div>
             <button
               type="submit"
               disabled={savingCat}
-              className="w-full py-3 rounded-full bg-[#171412] hover:bg-[#9e2a2b] text-white text-xs font-semibold uppercase tracking-[0.14em] cursor-pointer"
+              className="w-full py-2.5 bg-[#111111] hover:bg-[#9b1c1c] text-white text-sm font-medium cursor-pointer"
             >
-              {savingCat ? "Adding..." : "Create Category"}
+              {savingCat ? "Adding..." : "Add Category"}
             </button>
           </form>
 
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-[#e8e3dc] divide-y divide-[#f0ebe4]">
+          <div className="lg:col-span-7 border border-[#e5e5e5] divide-y divide-[#eeeeee]">
             {categories.map((cat) => (
-              <div key={cat.id} className="p-5 flex items-start justify-between gap-4">
+              <div key={cat.id} className="p-4 flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-medium text-sm text-[#171412]">
-                    {cat.name}{" "}
-                    {cat.tibetan_name && (
-                      <span className="text-xs text-[#9e2a2b] ml-1">{cat.tibetan_name}</span>
-                    )}
-                  </p>
-                  <p className="text-xs text-[#6c635b] mt-1">{cat.description}</p>
+                  <p className="text-sm font-medium text-[#111111]">{cat.name}</p>
+                  <p className="text-xs text-[#666666] mt-0.5">{cat.description}</p>
                 </div>
-                <span className="font-mono text-[11px] text-[#7a7067] shrink-0">
-                  /{cat.slug}
-                </span>
+                <span className="text-xs text-[#888888] shrink-0">/{cat.slug}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* TAB 3: ORDERS */}
+      {/* ORDERS TAB */}
       {tab === "orders" && (
         <div className="space-y-4">
           {orders.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-[#e8e3dc] p-12 text-center text-sm text-[#6c635b]">
-              No customer orders received yet.
+            <div className="border border-[#e5e5e5] p-10 text-center text-sm text-[#666666]">
+              No orders yet.
             </div>
           ) : (
             orders.map((order) => (
-              <div
-                key={order.id}
-                className="bg-white rounded-2xl border border-[#ece7df] p-6 space-y-4"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#f0ebe4]">
+              <div key={order.id} className="border border-[#e5e5e5] p-5 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-[#eeeeee]">
                   <div>
-                    <p className="font-mono text-sm font-semibold text-[#171412]">
+                    <p className="text-sm font-semibold text-[#111111] tabular-nums">
                       {order.order_number}
                     </p>
-                    <p className="text-xs text-[#6c635b] mt-0.5">
+                    <p className="text-xs text-[#555555]">
                       {order.customer_name} · {order.customer_phone} · {order.customer_email}
                     </p>
-                    <p className="text-[11px] text-[#8c8278] mt-0.5">
+                    <p className="text-xs text-[#777777] mt-0.5">
                       {formatDateIST(order.created_at)} ·{" "}
                       {order.fulfillment_method === "studio_pickup"
-                        ? "Majnu Ka Tila Studio Pickup"
+                        ? "Majnu Ka Tila Pickup"
                         : `${order.shipping_address?.line1 ?? ""}, ${order.shipping_address?.city ?? ""} ${order.shipping_address?.postalCode ?? ""}`}
                     </p>
                   </div>
-
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-base font-semibold text-[#171412]">
+                    <span className="text-sm font-semibold tabular-nums text-[#111111]">
                       {formatINR(order.total_paise)}
                     </span>
                     <select
@@ -994,7 +893,7 @@ export function AdminDashboard({
                         handleOrderStatusChange(order.id, e.target.value as OrderStatus)
                       }
                       aria-label={`Order status for ${order.order_number}`}
-                      className="px-3 py-1.5 rounded-full border border-[#dcd5ca] bg-white text-xs font-medium cursor-pointer"
+                      className="px-3 py-1.5 border border-[#d4d4d4] bg-white text-xs cursor-pointer"
                     >
                       {Object.entries(ORDER_STATUS_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>
@@ -1005,13 +904,13 @@ export function AdminDashboard({
                   </div>
                 </div>
 
-                <div className="space-y-1.5 text-xs">
+                <div className="space-y-1 text-xs text-[#444444]">
                   {(order.order_items ?? []).map((item) => (
-                    <div key={item.id} className="flex justify-between text-[#4b443e]">
+                    <div key={item.id} className="flex justify-between">
                       <span>
                         {item.product_name} ({item.size}) × {item.quantity}
                       </span>
-                      <span className="font-mono">{formatINR(item.line_total_paise)}</span>
+                      <span className="tabular-nums">{formatINR(item.line_total_paise)}</span>
                     </div>
                   ))}
                 </div>
@@ -1021,77 +920,68 @@ export function AdminDashboard({
         </div>
       )}
 
-      {/* TAB 4: FITTING INQUIRIES & SECURITY AUDIT LOG */}
+      {/* INQUIRIES & AUDIT LOG TAB */}
       {tab === "inquiries" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-[#e8e3dc] overflow-hidden">
-            <div className="px-6 py-4 bg-[#faf9f7] border-b border-[#eee9e2]">
-              <h2 className="font-serif text-xl font-medium text-[#171412]">
-                Majnu Ka Tila Fitting Inquiries ({inquiries.length})
+          <div className="lg:col-span-7 border border-[#e5e5e5] divide-y divide-[#eeeeee]">
+            <div className="px-5 py-3.5 bg-[#f7f7f5]">
+              <h2 className="text-sm font-semibold text-[#111111]">
+                Fitting Requests ({inquiries.length})
               </h2>
             </div>
-            <div className="divide-y divide-[#f0ebe4]">
-              {inquiries.length === 0 ? (
-                <p className="p-8 text-center text-xs text-[#6c635b]">No fitting requests yet.</p>
-              ) : (
-                inquiries.map((inq) => (
-                  <div key={inq.id} className="p-5 space-y-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-medium text-[#171412]">
-                          {inq.name} · <span className="text-[#9e2a2b]">{inq.garment_type}</span>
-                        </p>
-                        <p className="text-xs text-[#6c635b]">
-                          {inq.phone} · {inq.email}
-                          {inq.preferred_date ? ` · Preferred: ${inq.preferred_date}` : ""}
-                        </p>
-                      </div>
-                      <select
-                        value={inq.status}
-                        onChange={(e) =>
-                          handleInquiryStatusChange(
-                            inq.id,
-                            e.target.value as TailoringInquiry["status"]
-                          )
-                        }
-                        className="px-2.5 py-1 rounded-full border border-[#dcd5ca] text-[11px] bg-white"
-                      >
-                        <option value="new">New</option>
-                        <option value="contacted">Contacted</option>
-                        <option value="scheduled">Scheduled</option>
-                        <option value="completed">Completed</option>
-                        <option value="archived">Archived</option>
-                      </select>
+            {inquiries.length === 0 ? (
+              <p className="p-8 text-center text-sm text-[#666666]">No requests yet.</p>
+            ) : (
+              inquiries.map((inq) => (
+                <div key={inq.id} className="p-4 space-y-1.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-[#111111]">
+                        {inq.name} — {inq.garment_type}
+                      </p>
+                      <p className="text-xs text-[#666666]">
+                        {inq.phone} · {inq.email}
+                        {inq.preferred_date ? ` · ${inq.preferred_date}` : ""}
+                      </p>
                     </div>
-                    {inq.notes && <p className="text-xs text-[#5d554d]">{inq.notes}</p>}
+                    <select
+                      value={inq.status}
+                      onChange={(e) =>
+                        handleInquiryStatusChange(
+                          inq.id,
+                          e.target.value as TailoringInquiry["status"]
+                        )
+                      }
+                      className="px-2.5 py-1 border border-[#d4d4d4] text-xs bg-white"
+                    >
+                      <option value="new">New</option>
+                      <option value="contacted">Contacted</option>
+                      <option value="scheduled">Scheduled</option>
+                      <option value="completed">Completed</option>
+                      <option value="archived">Archived</option>
+                    </select>
                   </div>
-                ))
-              )}
-            </div>
+                  {inq.notes && <p className="text-xs text-[#555555]">{inq.notes}</p>}
+                </div>
+              ))
+            )}
           </div>
 
-          <div className="lg:col-span-5 bg-white rounded-3xl border border-[#e8e3dc] overflow-hidden">
-            <div className="px-6 py-4 bg-[#faf9f7] border-b border-[#eee9e2] flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#1f3a52]" />
-              <h2 className="font-serif text-xl font-medium text-[#171412]">
-                Immutable Security Audit Log
-              </h2>
+          <div className="lg:col-span-5 border border-[#e5e5e5] divide-y divide-[#eeeeee]">
+            <div className="px-5 py-3.5 bg-[#f7f7f5]">
+              <h2 className="text-sm font-semibold text-[#111111]">Admin Activity Log</h2>
             </div>
-            <div className="divide-y divide-[#f0ebe4] max-h-[480px] overflow-y-auto">
+            <div className="max-h-[460px] overflow-y-auto divide-y divide-[#eeeeee]">
               {auditLogs.length === 0 ? (
-                <p className="p-6 text-xs text-[#6c635b]">
-                  Admin actions (product creates, updates, uploads, status changes) will appear here.
-                </p>
+                <p className="p-6 text-xs text-[#666666]">No admin activity yet.</p>
               ) : (
                 auditLogs.map((log) => (
-                  <div key={log.id} className="px-5 py-3 text-xs space-y-0.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono font-semibold text-[#1f3a52]">{log.action}</span>
-                      <span className="text-[10px] text-[#8c8278]">
-                        {formatDateIST(log.created_at)}
-                      </span>
+                  <div key={log.id} className="px-4 py-3 text-xs space-y-0.5">
+                    <div className="flex justify-between gap-2">
+                      <span className="font-medium text-[#111111]">{log.action}</span>
+                      <span className="text-[#777777]">{formatDateIST(log.created_at)}</span>
                     </div>
-                    <p className="text-[11px] text-[#6c635b] font-mono truncate">
+                    <p className="text-[#666666] truncate">
                       {log.entity_type} · {log.entity_id}
                     </p>
                   </div>

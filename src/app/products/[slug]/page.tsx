@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { ProductWithCategory } from "@/lib/types";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
@@ -39,72 +38,53 @@ export default async function ProductPage({
   const related = (relatedData ?? []) as ProductWithCategory[];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-[#7a7067] mb-8">
-        <Link href="/" className="hover:text-[#171412]">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-[#666666] mb-7">
+        <Link href="/" className="hover:text-[#111111]">
           Home
         </Link>
-        <ChevronRight className="w-3.5 h-3.5" />
+        <span>/</span>
         {product.categories && (
           <>
             <Link
-              href={`/?category=${product.categories.slug}#collection`}
-              className="hover:text-[#171412]"
+              href={`/?category=${product.categories.slug}#shop`}
+              className="hover:text-[#111111]"
             >
               {product.categories.name}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <span>/</span>
           </>
         )}
-        <span className="text-[#171412] font-medium truncate">{product.name}</span>
+        <span className="text-[#111111] truncate">{product.name}</span>
       </nav>
 
       <ProductDetailClient product={product} />
 
-      {/* Related Tibetan Garments */}
       {related.length > 0 && (
-        <section className="mt-20 pt-14 border-t border-[#e8e3dc]">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#9e2a2b]">
-                Complete the Ensemble
-              </p>
-              <h2 className="font-serif text-3xl font-medium text-[#171412] mt-1">
-                Pair with Traditional Pieces
-              </h2>
-            </div>
-            <Link
-              href="/#collection"
-              className="text-xs font-semibold uppercase tracking-[0.12em] text-[#171412] hover:text-[#9e2a2b]"
-            >
-              View All
+        <section className="mt-20 pt-12 border-t border-[#e5e5e5]">
+          <div className="flex items-baseline justify-between mb-6">
+            <h2 className="text-xl font-semibold text-[#111111]">More Clothing</h2>
+            <Link href="/#shop" className="text-sm text-[#555555] hover:text-[#111111]">
+              View all
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-8">
             {related.map((item) => (
-              <Link
-                key={item.id}
-                href={`/products/${item.slug}`}
-                className="group bg-white rounded-2xl border border-[#ece7df] overflow-hidden hover:border-[#d5ccc0] transition-all"
-              >
-                <div className="aspect-[3/4] bg-white p-3">
+              <Link key={item.id} href={`/products/${item.slug}`} className="group block">
+                <div className="aspect-[3/4] bg-[#f5f5f3] overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.image_url}
                     alt={item.name}
-                    className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                   />
                 </div>
-                <div className="p-4 border-t border-[#f3efe9]">
-                  <p className="text-[10px] uppercase tracking-[0.12em] text-[#7a7067]">
-                    {item.categories?.name}
-                  </p>
-                  <p className="font-serif text-lg text-[#171412] group-hover:text-[#9e2a2b] mt-0.5 line-clamp-1">
+                <div className="pt-3 flex items-start justify-between gap-2">
+                  <p className="text-sm text-[#111111] group-hover:underline leading-snug">
                     {item.name}
                   </p>
-                  <p className="font-mono text-sm font-semibold text-[#171412] mt-1.5">
+                  <p className="text-sm font-medium tabular-nums text-[#111111] shrink-0">
                     {formatINR(item.price_paise)}
                   </p>
                 </div>
