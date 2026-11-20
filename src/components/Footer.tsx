@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export function Footer() {
   return (
     <footer className="bg-[#f7f7f5] border-t border-[#e5e5e5] mt-20">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         <div className="space-y-3">
-          <p className="text-base font-semibold text-[#111111]">S.S Tailors</p>
+          <Link href="/" className="inline-flex items-center">
+            <BrandLogo size="sm" />
+          </Link>
           <p className="text-sm text-[#555555] leading-relaxed">
             Traditional Tibetan clothing shop and custom tailoring in Majnu Ka Tila, New Delhi.
           </p>

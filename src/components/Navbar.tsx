@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Menu, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/components/CartProvider";
+import { BrandLogo } from "@/components/BrandLogo";
 
 interface NavUser {
   id: string;
@@ -54,11 +55,8 @@ export function Navbar({ user }: { user: NavUser | null }) {
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <Link
-            href="/"
-            className="text-lg font-semibold tracking-tight text-[#111111] whitespace-nowrap"
-          >
-            S.S Tailors
+          <Link href="/" aria-label="S.S Tailors Home" className="inline-flex items-center">
+            <BrandLogo size="md" />
           </Link>
         </div>
 

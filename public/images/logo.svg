@@ -1,0 +1,9 @@
+<svg width="220" height="44" viewBox="0 0 220 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(22 22) rotate(45) translate(-16 -16)" stroke="#9B1C1C" stroke-width="2.4" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M11 8.5V6H21V18.5" />
+    <path d="M21 23.5V26H11V13.5" />
+    <path d="M8.5 21H6V11H18.5" />
+    <path d="M23.5 11H26V21H13.5" />
+  </g>
+  <text x="48" y="29" fill="#111111" font-family="'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="600" letter-spacing="-0.4">S.S Tailors</text>
+</svg>
